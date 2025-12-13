@@ -91,5 +91,5 @@ Key principle: **Read context files SEQUENTIALLY, not in parallel.** Later files
 
 ## License
 
-MIT
+[ISC](LICENSE.md)
 
