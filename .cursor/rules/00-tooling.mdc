@@ -1,0 +1,130 @@
+# Development Tooling
+
+## Package Management
+
+### Node.js / JavaScript
+- **Package Manager**: npm (comes with Node.js)
+- **Usage**: `npm install`, `npm update`, `npx`
+- **Lock file**: `package-lock.json`
+
+### Python
+- **Package Manager**: `uv` (NOT pip, NOT poetry)
+- **Usage**: 
+  ```bash
+  uv venv .venv --python 3.11        # Create virtual environment
+  source .venv/bin/activate           # Activate venv
+  uv pip install <package>            # Install package
+  uv pip install --upgrade <package>  # Upgrade package
+  uv pip list                         # List installed packages
+  uv pip freeze                       # Generate requirements
+  ```
+- **Why uv**: Faster than pip, better dependency resolution
+- **Do NOT use**: `pip`, `pip3`, `python -m pip`
+
+## Version Management
+
+### mise (formerly rtx)
+- **Purpose**: Manages Node.js and Python versions
+- **Config**: `.tool-versions` file in project root
+- **Usage**:
+  ```bash
+  mise install            # Install versions from .tool-versions
+  mise use node@24        # Set Node.js version
+  mise use python@3.11    # Set Python version
+  ```
+
+## Important Tool Notes
+
+### For AI Assistants
+
+1. **Always use `uv` for Python packages**, never `pip`
+   ```bash
+   # ✅ CORRECT
+   uv pip install package-name
+   
+   # ❌ WRONG
+   pip install package-name
+   python -m pip install package-name
+   ```
+
+2. **Use npm for JavaScript packages**
+   ```bash
+   npm install package-name
+   npx command
+   ```
+
+3. **Check tool versions with mise**
+   ```bash
+   mise current          # Show current versions
+   mise list             # Show available versions
+   ```
+
+## Virtual Environments
+
+### Python (.venv)
+- **Location**: `/Volumes/VRMini/n8n/.venv`
+- **Created with**: `uv venv .venv --python 3.11`
+- **Activate**: `source .venv/bin/activate`
+- **Deactivate**: `deactivate`
+- **Check if active**: Look for `(.venv)` in prompt
+
+### Node.js (node_modules)
+- **Location**: `/Volumes/VRMini/n8n/node_modules`
+- **No activation needed**: npm/npx automatically use local node_modules
+- **Install**: `npm install`
+- **Clean**: `rm -rf node_modules && npm install`
+
+## Quick Reference
+
+| Task | Tool | Command |
+|------|------|---------|
+| Install Python package | uv | `uv pip install <package>` |
+| Install Node package | npm | `npm install <package>` |
+| Update Python package | uv | `uv pip install --upgrade <package>` |
+| Update Node package | npm | `npm update <package>` |
+| List Python packages | uv | `uv pip list` |
+| List Node packages | npm | `npm list` |
+| Create Python venv | uv | `uv venv .venv --python 3.11` |
+| Set Node version | mise | `mise use node@24` |
+| Set Python version | mise | `mise use python@3.11` |
+
+## Common Mistakes to Avoid
+
+### ❌ Don't Do This
+```bash
+pip install package           # Wrong: Use uv
+python -m pip install package # Wrong: Use uv
+pip3 install package          # Wrong: Use uv
+npm install -g package        # Wrong: Use local install
+```
+
+### ✅ Do This Instead
+```bash
+uv pip install package        # Correct: Use uv
+npm install package           # Correct: Local install
+```
+
+## Troubleshooting
+
+### "pip command not found"
+- **Solution**: Use `uv pip` instead of `pip`
+
+### "Package not found" with uv
+- **Check**: Package name might be different on PyPI
+- **Try**: `uv pip install <package> --dry-run` to test
+
+### Node package issues
+- **Solution**: Delete node_modules and reinstall
+  ```bash
+  rm -rf node_modules package-lock.json
+  npm install
+  ```
+
+### Python package issues
+- **Solution**: Recreate virtual environment
+  ```bash
+  rm -rf .venv
+  uv venv .venv --python 3.11
+  source .venv/bin/activate
+  uv pip install <packages>
+  ```

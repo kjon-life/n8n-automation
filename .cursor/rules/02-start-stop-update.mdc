@@ -1,0 +1,378 @@
+# n8n Start, Stop, and Update Procedures
+
+## Starting n8n
+
+### Option 1: Use the Start Script (Recommended)
+
+```bash
+cd /Volumes/VRMini/n8n
+./start-n8n.sh
+```
+
+The script automatically:
+- Checks if n8n is already running
+- Activates the Python virtual environment
+- Ensures the task runner symlink exists
+- Starts n8n in the background
+- Shows the access URL
+
+### Option 2: Manual Start
+
+```bash
+cd /Volumes/VRMini/n8n
+
+# Activate Python environment (for task runner)
+source .venv/bin/activate
+
+# Ensure symlink exists
+mkdir -p node_modules/@n8n/task-runner-python
+ln -sf /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv
+
+# Set data directory
+export N8N_USER_FOLDER=/Volumes/VRMini/n8n/data
+
+# Start n8n
+npx n8n start
+```
+
+### Verification
+
+Check if n8n is running:
+```bash
+# Check if port 5678 is in use
+lsof -i :5678
+
+# Or check the process
+ps aux | grep n8n
+```
+
+Access n8n at: **http://localhost:5678**
+
+## Stopping n8n
+
+### Option 1: Use the Stop Script (Recommended)
+
+```bash
+cd /Volumes/VRMini/n8n
+./stop-n8n.sh
+```
+
+The script:
+- Finds the n8n process
+- Gracefully stops it
+- Confirms shutdown
+
+### Option 2: Manual Stop
+
+```bash
+# Find the n8n process
+lsof -i :5678
+# Note the PID
+
+# Kill the process gracefully
+kill <PID>
+
+# Or force kill if needed
+kill -9 <PID>
+```
+
+### Option 3: Kill All n8n Processes
+
+```bash
+pkill -f "n8n start"
+```
+
+**Warning:** This kills all n8n processes. Use with caution if you have multiple n8n instances.
+
+## Restarting n8n
+
+```bash
+cd /Volumes/VRMini/n8n
+./stop-n8n.sh
+./start-n8n.sh
+```
+
+Or combine:
+```bash
+cd /Volumes/VRMini/n8n
+./stop-n8n.sh && ./start-n8n.sh
+```
+
+## Updating n8n
+
+### Option 1: Use the Update Script (Recommended)
+
+```bash
+cd /Volumes/VRMini/n8n
+./update-n8n.sh next
+```
+
+The script:
+1. Stops n8n if running
+2. Updates n8n via npm
+3. Recreates the Python task runner symlink
+4. Restarts n8n
+
+### Option 2: Manual Update
+
+```bash
+cd /Volumes/VRMini/n8n
+
+# Stop n8n
+./stop-n8n.sh
+
+# Update n8n
+npm update n8n
+
+# OR update to latest version
+npm install n8n@next
+
+# Recreate symlink (CRITICAL STEP)
+mkdir -p node_modules/@n8n/task-runner-python
+ln -sf /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv
+
+# Verify symlink
+ls -la node_modules/@n8n/task-runner-python/.venv
+
+# Restart n8n
+./start-n8n.sh
+```
+
+### After Update Checklist
+
+1. ✅ Verify symlink exists: `ls -la node_modules/@n8n/task-runner-python/.venv`
+2. ✅ Test JavaScript code node execution
+3. ✅ Test Python code node execution (if using Python)
+4. ✅ Check existing workflows still work
+
+## Task Runner Management
+
+### JavaScript Task Runner
+
+The JavaScript task runner is built into n8n and doesn't require separate management.
+
+### Python Task Runner
+
+#### Check if Python Dependencies are Updated
+
+```bash
+source .venv/bin/activate
+uv pip list | grep n8n
+```
+
+#### Update Python Task Runner
+
+```bash
+source .venv/bin/activate
+uv pip install --upgrade n8n-python-runner
+```
+
+**Note**: Python task runner may not be available yet in n8n 2.0
+
+## Common Operations
+
+### Check n8n Version
+
+```bash
+cd /Volumes/VRMini/n8n
+npx n8n --version
+```
+
+### View n8n Logs
+
+```bash
+# If running in foreground, logs appear in terminal
+
+# If running in background (via script)
+tail -f /Volumes/VRMini/n8n/data/logs/n8n.log
+```
+
+### Clean Start (Clear Cache)
+
+```bash
+cd /Volumes/VRMini/n8n
+./stop-n8n.sh
+
+# Clear n8n cache (be careful - this may reset some settings)
+rm -rf data/.n8n/.cache/
+
+./start-n8n.sh
+```
+
+### Backup Workflows and Credentials
+
+```bash
+# Backup the entire data directory
+cp -r /Volumes/VRMini/n8n/data /Volumes/VRMini/n8n/data_backup_$(date +%Y%m%d)
+
+# Or just backup workflows and credentials
+cp -r /Volumes/VRMini/n8n/data/.n8n /Volumes/VRMini/n8n/n8n_backup_$(date +%Y%m%d)
+```
+
+## Environment Variables
+
+These can be set before starting n8n to customize behavior:
+
+```bash
+# Data storage location
+export N8N_USER_FOLDER=/Volumes/VRMini/n8n/data
+
+# Port (default: 5678)
+export N8N_PORT=5678
+
+# Basic auth (optional)
+export N8N_BASIC_AUTH_ACTIVE=true
+export N8N_BASIC_AUTH_USER=admin
+export N8N_BASIC_AUTH_PASSWORD=password
+
+# Disable telemetry (optional)
+export N8N_DIAGNOSTICS_ENABLED=false
+
+# Log level (optional: info, debug, warn, error)
+export N8N_LOG_LEVEL=info
+```
+
+## Scripts Overview
+
+### start-n8n.sh
+
+**Location:** `/Volumes/VRMini/n8n/start-n8n.sh`  
+**Purpose:** Start n8n with all necessary setup  
+**What it does:**
+- Checks if already running
+- Sets up environment
+- Creates symlink
+- Starts n8n in background
+- Displays access URL
+
+### stop-n8n.sh
+
+**Location:** `/Volumes/VRMini/n8n/stop-n8n.sh`  
+**Purpose:** Gracefully stop n8n  
+**What it does:**
+- Finds n8n process
+- Sends termination signal
+- Confirms shutdown
+
+### update-n8n.sh
+
+**Location:** `/Volumes/VRMini/n8n/update-n8n.sh`  
+**Purpose:** Update n8n to latest version  
+**What it does:**
+- Stops n8n
+- Updates via npm
+- Recreates symlink
+- Restarts n8n
+
+### start-task-runner.sh
+
+**Location:** `/Volumes/VRMini/n8n/start-task-runner.sh`  
+**Purpose:** Manually start task runner (usually automatic)  
+**Note:** Typically not needed - task runners start automatically with n8n
+
+## Troubleshooting
+
+### n8n Won't Start
+
+1. **Check if already running:**
+   ```bash
+   lsof -i :5678
+   ```
+   If yes, stop it first.
+
+2. **Check symlink:**
+   ```bash
+   ls -la node_modules/@n8n/task-runner-python/.venv
+   ```
+   Recreate if broken or missing.
+
+3. **Check logs:**
+   ```bash
+   tail -f data/logs/n8n.log
+   ```
+
+4. **Try manual start to see errors:**
+   ```bash
+   npx n8n start
+   ```
+
+### Task Runner Not Working
+
+1. **Verify symlink exists and is correct:**
+   ```bash
+   ls -la node_modules/@n8n/task-runner-python/.venv
+   ```
+
+2. **Check Python environment:**
+   ```bash
+   source .venv/bin/activate
+   which python
+   uv pip list | grep n8n
+   ```
+
+3. **Recreate symlink:**
+   ```bash
+   rm node_modules/@n8n/task-runner-python/.venv
+   ln -s /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv
+   ```
+
+### Port Already in Use
+
+```bash
+# Find what's using port 5678
+lsof -i :5678
+
+# Kill the process
+kill <PID>
+
+# Or change n8n port
+export N8N_PORT=5679
+./start-n8n.sh
+```
+
+### After npm install, Nothing Works
+
+**Likely cause:** The symlink was destroyed when node_modules was cleared.
+
+**Solution:**
+```bash
+mkdir -p node_modules/@n8n/task-runner-python
+ln -sf /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv
+./start-n8n.sh
+```
+
+## Important Notes for Assistants
+
+1. **Always check if n8n is running before starting**
+   - Use: `lsof -i :5678`
+   - Don't start multiple instances
+
+2. **Always recreate symlink after npm operations**
+   - After `npm install`, `npm update`, or clearing node_modules
+   - This is the #1 cause of task runner failures
+
+3. **Use the scripts when possible**
+   - They handle edge cases and proper shutdown/startup
+   - They maintain the symlink automatically
+
+4. **Check logs when things go wrong**
+   - `tail -f data/logs/n8n.log`
+   - Errors are usually clear
+
+5. **n8n runs on port 5678 by default**
+   - URL: http://localhost:5678
+   - Change with N8N_PORT environment variable if needed
+
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Start n8n | `./start-n8n.sh` |
+| Stop n8n | `./stop-n8n.sh` |
+| Restart n8n | `./stop-n8n.sh && ./start-n8n.sh` |
+| Update n8n | `./update-n8n.sh` |
+| Check if running | `lsof -i :5678` |
+| View logs | `tail -f data/logs/n8n.log` |
+| Recreate symlink | `ln -sf /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv` |
+| Check version | `npx n8n --version` |
+| Access n8n | http://localhost:5678 |

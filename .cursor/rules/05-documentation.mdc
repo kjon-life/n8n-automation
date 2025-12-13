@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+- documentation lives beside the code
+- define the purpose, structure and steps as succinctly as possible
+- code should be self-documenting and commented
+- readme should explain why the code exists, and what dependencies are non-obvious

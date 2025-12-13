@@ -1,0 +1,21 @@
+{
+  "name": "n8n",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "n8n start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "n8n": "^2.0.1"
+  },
+  "overrides": {
+    "@getzep/zep-cloud": {
+      "@langchain/core": "1.1.0"
+    }
+  }
+}

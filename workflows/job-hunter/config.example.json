@@ -1,0 +1,29 @@
+{
+  "_comment": "Copy to config.json - DO NOT commit config.json to git",
+  "search": {
+    "query": "python",
+    "location": "remote",
+    "experience_levels": ["junior", "mid_level", "senior"],
+    "job_type": "remote"
+  },
+  "filters": {
+    "min_salary": 100000,
+    "exclude_companies": [],
+    "exclude_keywords": ["crypto", "web3", "blockchain"],
+    "require_keywords": []
+  },
+  "automation": {
+    "batch_size": 10,
+    "delay_between_requests_ms": 2000,
+    "max_retries": 3
+  },
+  "notifications": {
+    "slack_webhook": "",
+    "email": ""
+  },
+  "paths": {
+    "resume": "'/Users/trust/Documents/2 Resources/wellfound/jon_h_williams_resume_2025.docx'",
+    "cover_letter_template": "lib/prompts/cover_letter.md"
+  }
+}
+

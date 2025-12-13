@@ -1,0 +1,210 @@
+# n8n Project Setup
+
+## Project Overview
+
+This is a local n8n installation with custom task runner support for JavaScript and Python code execution. The project uses npm for package management and includes specialized configuration for task runners.
+
+## Installation Method
+
+n8n was installed **locally via npm** (NOT Docker, NOT global npm install).
+
+```bash
+npm install n8n
+```
+
+## Directory Structure
+
+```
+/Volumes/VRMini/n8n/
+├── node_modules/          # npm packages including n8n
+│   ├── n8n/              # Main n8n package
+│   ├── @n8n/             # n8n scoped packages
+│   │   ├── task-runner-python/  # Python task runner
+│   │   └── config/       # n8n configuration
+├── .venv/                # Python virtual environment for task runner
+├── data/                 # n8n runtime data
+│   ├── logs/             # n8n log files
+│   └── .n8n/             # n8n user data (workflows, credentials, etc.)
+├── design/               # Documentation and design files
+│   ├── screenshots/      # Browser tool screenshots
+│   └── *.md              # Design documents
+├── package.json          # Project dependencies
+├── package-lock.json     # Locked dependency versions
+├── start-n8n.sh          # Script to start n8n
+├── start-task-runner.sh  # Script to start task runner
+├── stop-n8n.sh           # Script to stop n8n
+└── update-n8n.sh         # Script to update n8n
+```
+
+## How the Project is Built
+
+### 1. Initial Setup
+
+The project was set up with these steps:
+
+```bash
+# Create project directory
+mkdir -p /Volumes/VRMini/n8n
+cd /Volumes/VRMini/n8n
+
+# Initialize npm project
+npm init -y
+
+# Install n8n locally
+npm install n8n
+
+# Create Python virtual environment for task runner
+# NOTE python venv for task runner was a massive 6+ hour fail
+uv venv .venv --python 3.11
+source .venv/bin/activate
+uv pip install n8n-python-runner
+```
+
+### 2. Special Configuration
+
+#### Python Task Runner Virtual Environment
+
+**Critical:** The Python task runner expects its virtual environment to be at:
+```
+node_modules/@n8n/task-runner-python/.venv
+```
+
+**Solution:** Created a symlink to the actual .venv location:
+```bash
+mkdir -p node_modules/@n8n/task-runner-python
+ln -s /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv
+```
+
+**Why this matters:** 
+- n8n's task runner looks for the venv in a specific location within node_modules
+- We maintain the actual venv at the project root for easier management
+- The symlink bridges the gap without duplicating the entire virtual environment
+
+#### Environment Configuration
+
+n8n uses environment variables for configuration. Key settings:
+
+```bash
+# Data storage location
+export N8N_USER_FOLDER=/Volumes/VRMini/n8n/data
+
+# Task runner settings (configured via n8n's config system)
+# See: node_modules/@n8n/config/dist/configs/runners.config.js
+```
+
+## Configuration Files
+
+### 1. Package.json
+**Location:** `/Volumes/VRMini/n8n/package.json`
+**Purpose:** Defines project dependencies and scripts
+**Key dependency:** `"n8n": "^1.70.2"` (or current version)
+
+### 2. Task Runner Config
+**Location:** `/Volumes/VRMini/n8n/node_modules/@n8n/config/dist/configs/runners.config.js`
+**Purpose:** Configures task runner behavior (ports, modes, etc.)
+**Important:** This file is in node_modules and will be reset on npm install/update
+
+### 3. Python Virtual Environment
+**Location:** `/Volumes/VRMini/n8n/.venv/`
+**Symlink:** `node_modules/@n8n/task-runner-python/.venv` → `/Volumes/VRMini/n8n/.venv`
+**Purpose:** Python environment for Python code nodes
+**Important:** Must be recreated/relinked after npm install that clears node_modules
+
+### 4. n8n User Data
+**Location:** `/Volumes/VRMini/n8n/data/.n8n/`
+**Purpose:** Stores workflows, credentials, settings
+**Contents:**
+- `workflows/` - Workflow definitions
+- `credentials/` - Encrypted credentials
+- `config` - User settings
+
+## Special Tweaks Made to Get n8n Working
+
+### 1. Python Task Runner Symlink
+**Problem:** Task runner couldn't find Python virtual environment  
+**Solution:** Created symlink from node_modules to actual .venv location  
+**Command:** `ln -s /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv`
+
+### 2. Local npm Installation
+**Problem:** Global installation creates permission and path issues  
+**Solution:** Install n8n locally via npm in project directory  
+**Benefit:** Easier to manage, update, and control versions
+
+### 3. Data Directory Separation
+**Problem:** Default n8n stores data in ~/.n8n which mixes projects  
+**Solution:** Set N8N_USER_FOLDER to project-specific data directory  
+**Result:** Clean separation between different n8n projects
+
+### 4. Task Runner Port Configuration
+**Problem:** Default task runner ports may conflict  
+**Solution:** Configuration in runners.config.js (if needed)  
+**Note:** May need to be reconfigured after updates
+
+## How to Run the Project
+
+See `.cursor/rules/02-start-stop-update.md` for detailed instructions.
+
+Quick start:
+```bash
+cd /Volumes/VRMini/n8n
+./start-n8n.sh
+```
+
+## Dependencies
+
+### Node.js Dependencies (from package.json)
+- **n8n**: Main workflow automation platform
+- Installed via: `npm install`
+
+### Python Dependencies (in .venv)
+- **n8n-python-runner**: Python task runner for n8n code nodes (if available)
+- Installed via: `uv pip install n8n-python-runner`
+- **Note**: Package may not be available yet in n8n 2.0
+
+### System Requirements
+- **Node.js**: v18+ (managed via mise)
+- **Python**: v3.11+ (managed via mise)
+- **npm**: Comes with Node.js
+- **uv**: Python package installer (used instead of pip)
+
+## Important Notes for Assistants
+
+1. **Never delete node_modules and reinstall without recreating the symlink**
+   - The symlink must be recreated after any operation that clears node_modules
+   - Command: `ln -s /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv`
+
+2. **npm commands must be run from project root**
+   - Always `cd /Volumes/VRMini/n8n` first
+
+3. **Check if n8n is already running before starting**
+   - Use: `lsof -i :5678` to check
+   - Multiple instances will conflict
+
+4. **The .venv is NOT in node_modules**
+   - It's at the project root: `/Volumes/VRMini/n8n/.venv`
+   - Don't try to find it in node_modules directly
+
+5. **After npm updates, verify the symlink**
+   - Check: `ls -la node_modules/@n8n/task-runner-python/.venv`
+   - Recreate if missing or broken
+
+## Version Control Notes
+
+**Git ignore patterns needed:**
+- `node_modules/`
+- `.venv/`
+- `data/.n8n/` (contains sensitive credentials)
+- `data/logs/`
+
+**Keep in version control:**
+- `package.json`
+- `package-lock.json`
+- Shell scripts (start-n8n.sh, etc.)
+- Documentation (design/ folder)
+- Configuration templates
+
+## Troubleshooting Reference
+
+See design documents for detailed troubleshooting:
+- `/Volumes/VRMini/n8n/design/2025-12-10-install.md` - Installation issues
+- `/Volumes/VRMini/n8n/design/2025-12-11-n8n-2.0-task-runners.md` - Task runner issues

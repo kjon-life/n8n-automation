@@ -1,0 +1,486 @@
+# Browser Tools and Workflow Development
+
+## Overview
+
+This project uses the Browser Tools MCP (Model Context Protocol) to enable AI assistants to interact with the n8n web interface. This allows assistants to:
+- View workflows visually
+- Debug code nodes
+- Capture screenshots
+- Monitor console logs and network requests
+- Run audits (accessibility, performance, SEO)
+- Help write and test workflow code
+
+## Browser Tools Architecture
+
+The system consists of three components:
+
+1. **Browser Tools Server** - HTTP server on port 3025 (runs in background)
+2. **Chrome Extension** - BrowserTools MCP extension (captures browser data)
+3. **Browser Tools MCP** - MCP server configured in Cursor (bridges AI to browser)
+
+## Getting Browser Tools Connected
+
+### Quick Start
+
+```bash
+# 1. Start browser-tools-server (usually already running)
+cd /Users/trust/Dev/mcps/browser-tools-mcp/browser-tools-server
+npm start > /tmp/browser-tools-server.log 2>&1 &
+
+# 2. Open Chrome with correct profile and debugging
+open -na "Google Chrome" --args "--profile-directory=Profile 2" --remote-debugging-port=9222
+
+# 3. Navigate to n8n
+# In Chrome, go to: http://localhost:5678
+```
+
+### Detailed Setup Instructions
+
+See: `/Volumes/VRMini/n8n/design/browser-tools-setup.md` for complete setup guide.
+
+### Important: Chrome Profile Mapping
+
+Chrome profiles have confusing directory vs. display names:
+
+| Directory Name | UI Display Name | Purpose |
+|----------------|-----------------|---------|
+| `Profile 1` | APIsec profile | Jon's work profile |
+| `Profile 2` | **Profile 5** ✅ | **Use this for browser tools** |
+| `Profile 4` | kjon-life | Jon's personal profile |
+| `Profile 5` | Person 1 | Default profile |
+
+**Always use Profile 2** (displays as "Profile 5" in Chrome UI)!
+
+### Verifying Browser Tools Connection
+
+The extension should show in Chrome DevTools:
+- Green "Connected" indicator
+- Server: localhost:3025
+- Version: v1.2.0
+
+Test from Cursor:
+```typescript
+// These functions should work when connected:
+user-browser-tools-takeScreenshot()
+user-browser-tools-getConsoleLogs()
+```
+
+## Available Browser Tools Functions
+
+### Viewing and Debugging
+
+- **`user-browser-tools-takeScreenshot`** - Capture current browser state
+  - Saves to: `/Volumes/VRMini/n8n/design/screenshots/`
+  - Useful for: Seeing workflow structure, node configurations, errors
+
+- **`user-browser-tools-getConsoleLogs`** - Get browser console logs
+  - Includes: All console.log, console.warn, console.error messages
+  - Useful for: Debugging JavaScript execution, finding errors
+
+- **`user-browser-tools-getConsoleErrors`** - Get only console errors
+  - Filtered: Only error-level messages
+  - Useful for: Quick error diagnosis
+
+### Network Monitoring
+
+- **`user-browser-tools-getNetworkLogs`** - Get all network requests
+  - Includes: Full request/response data with headers and bodies
+  - Useful for: API debugging, seeing what data flows between nodes
+
+- **`user-browser-tools-getNetworkErrors`** - Get failed requests only
+  - Filtered: Only failed/errored requests
+  - Useful for: Finding API failures, connection issues
+
+### Element Inspection
+
+- **`user-browser-tools-getSelectedElement`** - Get currently selected DOM element
+  - Returns: HTML structure, attributes, computed styles
+  - Useful for: UI debugging, finding selectors
+
+### Maintenance
+
+- **`user-browser-tools-wipeLogs`** - Clear all stored logs
+  - Effect: Resets console and network logs in extension
+  - Useful for: Starting fresh debugging session
+
+### Audits
+
+- **`user-browser-tools-runAccessibilityAudit`** - WCAG accessibility audit
+- **`user-browser-tools-runPerformanceAudit`** - Performance metrics
+- **`user-browser-tools-runSEOAudit`** - SEO analysis
+- **`user-browser-tools-runBestPracticesAudit`** - Code best practices
+
+## How Assistants Can Help Write Workflows
+
+### 1. Visual Workflow Understanding
+
+Assistants can:
+- Take screenshots to see the workflow structure
+- Identify which nodes are connected
+- Understand the workflow logic flow
+- Spot configuration issues visually
+
+Example workflow:
+```
+Assistant: Let me see your workflow
+[Takes screenshot]
+Assistant: I can see you have:
+- Manual Trigger → Code Node → HTTP Request → Another Code Node
+- The HTTP Request is failing (red indicator)
+```
+
+### 2. Code Node Development
+
+Assistants can help write code for JavaScript and Python code nodes:
+
+#### Process:
+1. **View current code** - Screenshot shows the code editor
+2. **Understand context** - See INPUT data structure
+3. **Write/modify code** - Assistant suggests code
+4. **Test execution** - User executes, assistant monitors results
+5. **Debug issues** - Console logs show errors
+
+#### Example JavaScript Code Node
+
+```javascript
+// Assistant can help write code like this:
+
+// Access input data
+const items = $input.all();
+
+// Process each item
+const results = items.map(item => {
+  const data = item.json;
+  
+  // Transform data
+  return {
+    json: {
+      id: data.id,
+      processed: true,
+      timestamp: new Date().toISOString(),
+      result: someCalculation(data)
+    }
+  };
+});
+
+// Return results
+return results;
+```
+
+#### Example Python Code Node
+
+```python
+# Assistant can help with Python code too:
+
+# Access input data
+items = _input.all()
+
+# Process data
+results = []
+for item in items:
+    data = item.json
+    
+    # Transform
+    results.append({
+        'json': {
+            'id': data['id'],
+            'processed': True,
+            'result': some_calculation(data)
+        }
+    })
+
+# Return
+return results
+```
+
+### 3. Debugging Workflows
+
+When things go wrong, assistants can:
+
+1. **Capture the error state**
+   ```typescript
+   takeScreenshot() // See the error visually
+   getConsoleErrors() // Get error messages
+   ```
+
+2. **Analyze network requests**
+   ```typescript
+   getNetworkLogs() // See what API calls were made
+   ```
+
+3. **Suggest fixes** based on:
+   - Error messages in console
+   - Failed network requests
+   - Visual indicators in screenshot
+   - Code in the node
+
+### 4. Workflow Testing
+
+Assistants can help test workflows:
+
+1. **Before execution:**
+   - Review code logic
+   - Check for potential issues
+   - Suggest edge cases to test
+
+2. **During execution:**
+   - Monitor console for errors
+   - Watch network requests
+   - Capture screenshots of results
+
+3. **After execution:**
+   - Verify output data format
+   - Check for warnings
+   - Suggest improvements
+
+### 5. Writing Complex Logic
+
+Assistants can help with:
+
+#### Data Transformation
+```javascript
+// Transform API response to desired format
+const transformed = $input.all().map(item => ({
+  json: {
+    name: item.json.firstName + ' ' + item.json.lastName,
+    email: item.json.contact.email,
+    age: calculateAge(item.json.birthDate)
+  }
+}));
+```
+
+#### Error Handling
+```javascript
+// Robust error handling
+try {
+  const result = await riskyOperation();
+  return [{json: {success: true, result}}];
+} catch (error) {
+  console.error('Operation failed:', error);
+  return [{json: {success: false, error: error.message}}];
+}
+```
+
+#### Conditional Logic
+```javascript
+// Route data based on conditions
+const items = $input.all();
+const categorized = items.map(item => {
+  const value = item.json.value;
+  
+  if (value > 100) {
+    return {json: {...item.json, category: 'high'}};
+  } else if (value > 50) {
+    return {json: {...item.json, category: 'medium'}};
+  } else {
+    return {json: {...item.json, category: 'low'}};
+  }
+});
+```
+
+#### API Integration
+```javascript
+// Call external API from code node
+const fetch = require('node-fetch');
+
+const items = $input.all();
+const enriched = await Promise.all(
+  items.map(async (item) => {
+    const response = await fetch(`https://api.example.com/data/${item.json.id}`);
+    const apiData = await response.json();
+    
+    return {
+      json: {
+        ...item.json,
+        enrichedData: apiData
+      }
+    };
+  })
+);
+
+return enriched;
+```
+
+## Workflow Development Best Practices
+
+### 1. Start Simple
+
+Begin with a minimal working version:
+```javascript
+// Start with this
+return [{json: {result: "It works!"}}];
+
+// Then expand
+// Add data processing, error handling, etc.
+```
+
+### 2. Use Console Logging
+
+Assistants can see console output:
+```javascript
+console.log('Input data:', $input.all());
+console.log('Processing item:', item.json);
+console.log('Result:', result);
+```
+
+### 3. Test Incrementally
+
+- Test each code node individually
+- Use "Execute previous nodes" to see input data
+- Verify output format before moving to next node
+
+### 4. Handle Errors Gracefully
+
+```javascript
+try {
+  // Your code here
+} catch (error) {
+  console.error('Error details:', error);
+  throw error; // Or return error object
+}
+```
+
+### 5. Use the n8n Context
+
+Code nodes have access to:
+```javascript
+$input      // Input data
+$json       // Current item's JSON data
+$node       // Node methods
+$workflow   // Workflow methods
+```
+
+## Common Workflow Patterns
+
+### Pattern 1: Filter Items
+```javascript
+const items = $input.all();
+const filtered = items.filter(item => item.json.status === 'active');
+return filtered;
+```
+
+### Pattern 2: Enrich Data
+```javascript
+const items = $input.all();
+const enriched = items.map(item => ({
+  json: {
+    ...item.json,
+    processedAt: new Date().toISOString(),
+    processedBy: 'workflow-123'
+  }
+}));
+return enriched;
+```
+
+### Pattern 3: Aggregate Data
+```javascript
+const items = $input.all();
+const total = items.reduce((sum, item) => sum + item.json.amount, 0);
+return [{json: {total, count: items.length}}];
+```
+
+### Pattern 4: Split into Batches
+```javascript
+const items = $input.all();
+const batchSize = 10;
+const batches = [];
+
+for (let i = 0; i < items.length; i += batchSize) {
+  batches.push({
+    json: {
+      batch: Math.floor(i / batchSize),
+      items: items.slice(i, i + batchSize).map(x => x.json)
+    }
+  });
+}
+
+return batches;
+```
+
+## Troubleshooting Browser Tools
+
+### Extension Not Connecting
+
+1. **Check if server is running:**
+   ```bash
+   lsof -i :3025
+   ```
+
+2. **Restart the server:**
+   ```bash
+   pkill -f browser-tools-server
+   cd /Users/trust/Dev/mcps/browser-tools-mcp/browser-tools-server
+   npm start > /tmp/browser-tools-server.log 2>&1 &
+   ```
+
+3. **Verify Chrome profile:**
+   - Make sure using Profile 2 directory
+   - Check extension is installed and enabled
+
+### Browser Tools Functions Not Working
+
+1. **Check Chrome debugging port:**
+   ```bash
+   curl http://localhost:9222/json
+   ```
+
+2. **Restart Chrome with correct flags:**
+   ```bash
+   pkill -f "Google Chrome"
+   open -na "Google Chrome" --args "--profile-directory=Profile 2" --remote-debugging-port=9222
+   ```
+
+3. **Check MCP is configured in Cursor**
+   - Should see browser-tools in MCP list
+   - File: `~/.cursor/mcp.json`
+
+### Screenshots Not Saving
+
+1. **Verify directory exists:**
+   ```bash
+   ls -la /Volumes/VRMini/n8n/design/screenshots/
+   ```
+
+2. **Check extension settings:**
+   - Open BrowserTools panel in Chrome DevTools
+   - Verify screenshot directory path
+   - Test with "Capture Screenshot" button
+
+## Tips for Assistants
+
+1. **Always start by taking a screenshot**
+   - Visual context is crucial
+   - Shows workflow structure and current state
+
+2. **Use console logs liberally**
+   - They're visible via getConsoleLogs()
+   - Help understand execution flow
+
+3. **Capture network logs for API debugging**
+   - See full request/response data
+   - Identify API issues quickly
+
+4. **Test incrementally**
+   - Write code in small chunks
+   - Test each piece before combining
+
+5. **Keep code simple and readable**
+   - User will maintain it
+   - Clear code = fewer bugs
+
+6. **Explain what the code does**
+   - User may need to modify it later
+   - Comments are helpful
+
+7. **Suggest error handling**
+   - Production workflows need robust error handling
+   - Log errors for debugging
+
+8. **Remember the context**
+   - n8n workflows process multiple items
+   - Return format must match expected structure
+
+## Example Assistant Session
+
+```
+User: "Help me write a code node that filters items where status is 'active'"
