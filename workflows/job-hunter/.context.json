@@ -1,0 +1,35 @@
+{
+  "session": {
+    "started_at": null,
+    "last_updated": null,
+    "status": "not_started"
+  },
+  "progress": {
+    "current_action": 0,
+    "current_step": null,
+    "next_step": "1.1",
+    "completed_actions": [],
+    "total_steps_completed": 0,
+    "estimated_completion": null
+  },
+  "accumulated_learnings": [
+    "Add learnings as you discover them"
+  ],
+  "known_selectors": {
+    "job_card": "TBD - discover during Action 2.1",
+    "job_title": "TBD",
+    "company_name": "TBD",
+    "location": "TBD",
+    "job_link": "TBD",
+    "apply_button": "TBD"
+  },
+  "environment": {
+    "n8n_running": false,
+    "n8n_url": "http://localhost:5678",
+    "browser_tools_connected": false,
+    "files_writable": true,
+    "disk_space_ok": true,
+    "last_health_check": null
+  },
+  "known_issues": []
+}
