@@ -8,16 +8,27 @@ Before doing ANY development work, coding, or answering technical questions abou
 
 1. **Read ALL rule files SEQUENTIALLY** (never in parallel)
 2. **Use the `Read` tool** (never batch read multiple rules files)
-3. **Read them in numerical order**: 00, 01, 02, 03, etc.
+3. **Read them in numerical order**: 00, 01, 02, ... 09
 4. **Complete each read** before starting the next one
 
 ### Required Reading Order
 
+**Universal Coding Standards (00-05):**
 ```
-1. Read: .cursor/rules/00-tooling.mdc
-2. Read: .cursor/rules/01-project-setup.md
-3. Read: .cursor/rules/02-start-stop-update.md
-4. Read: .cursor/rules/03-browser-tools-workflows.md
+1. Read: .cursor/rules/00-coding-style.mdc        # Coding style fundamentals
+2. Read: .cursor/rules/01-core-engineering.mdc    # Engineering philosophy
+3. Read: .cursor/rules/02-development-standards.mdc # Dev standards
+4. Read: .cursor/rules/03-writing-good-interfaces.mdc # Interface design
+5. Read: .cursor/rules/04-error-handling.mdc      # Error handling patterns
+6. Read: .cursor/rules/05-documentation.mdc       # Documentation rules
+```
+
+**Project-Specific n8n Rules (06-09):**
+```
+7. Read: .cursor/rules/06-tooling.mdc             # uv, npm, mise tooling
+8. Read: .cursor/rules/07-project-setup.mdc       # n8n project structure
+9. Read: .cursor/rules/08-start-stop-update.mdc   # n8n operations
+10. Read: .cursor/rules/09-browser-tools-workflows.mdc # Browser tools & workflows
 ```
 
 ### Why This Matters
@@ -32,31 +43,23 @@ Before doing ANY development work, coding, or answering technical questions abou
 ❌ **NEVER DO THIS:**
 ```typescript
 // DON'T batch read rules files in parallel
-Read('.cursor/rules/00-tooling.mdc')
-Read('.cursor/rules/01-project-setup.md')
-Read('.cursor/rules/02-start-stop-update.md')
+Read('.cursor/rules/00-coding-style.mdc')
+Read('.cursor/rules/01-core-engineering.mdc')
+Read('.cursor/rules/02-development-standards.mdc')
 // This causes you to miss context and make mistakes
 ```
 
 ✅ **ALWAYS DO THIS:**
 ```typescript
 // Step 1: Read first file
-Read('.cursor/rules/00-tooling.mdc')
+Read('.cursor/rules/00-coding-style.mdc')
 // Wait for response, understand it
 
 // Step 2: Read second file
-Read('.cursor/rules/01-project-setup.md')
+Read('.cursor/rules/01-core-engineering.mdc')
 // Wait for response, understand it
 
-// Step 3: Read third file
-Read('.cursor/rules/02-start-stop-update.md')
-// Wait for response, understand it
-
-// Step 4: Read fourth file
-Read('.cursor/rules/03-browser-tools-workflows.md')
-// Wait for response, understand it
-
-// Step 5: NOW you can start working
+// Continue sequentially through all files...
 ```
 
 ### Examples of When to Read Rules
@@ -89,3 +92,18 @@ This is an **n8n local installation** with:
 - Critical symlinks that must be maintained
 
 **You cannot guess how this project works. You MUST read the rules first.**
+
+## File Organization
+
+| File | Purpose | Always Applied |
+|------|---------|----------------|
+| 00-coding-style.mdc | Coding style fundamentals | ✅ Yes |
+| 01-core-engineering.mdc | Engineering philosophy | ✅ Yes |
+| 02-development-standards.mdc | Development standards | ✅ Yes |
+| 03-writing-good-interfaces.mdc | Interface design | ❌ On match |
+| 04-error-handling.mdc | Error handling | ✅ Yes |
+| 05-documentation.mdc | Documentation rules | ✅ Yes |
+| 06-tooling.mdc | uv, npm, mise tooling | Project-specific |
+| 07-project-setup.mdc | n8n project structure | Project-specific |
+| 08-start-stop-update.mdc | n8n operations | Project-specific |
+| 09-browser-tools-workflows.mdc | Browser tools | Project-specific |

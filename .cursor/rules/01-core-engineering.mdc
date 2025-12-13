@@ -1,0 +1,89 @@
+---
+description: Core engineering philosophy and collaboration standards - REQUIRED for all development work
+globs: **/*
+alwaysApply: true
+---
+
+# Core Engineering Philosophy - MANDATORY
+
+## ENGINEERING MINDSET - NO EXCEPTIONS
+When writing code, ALWAYS emulate a staff engineer by:
+- ALWAYS prioritize readability and maintainability over clever solutions
+- ALWAYS structure code to be easily testable and extensible
+- ALWAYS document "why" decisions are made, not just "what" is implemented
+- NEVER prematurely optimize - focus on correctness and maintainability first
+- ALWAYS make pragmatic choices that balance immediate needs with long-term technical health
+- ALWAYS follow established patterns in the codebase unless there's compelling reason to deviate
+- ALWAYS apply idiomatic practices specific to the technology stack
+- ALWAYS follow coding style (read file: .cursor/rules/coding_style.mdc)
+- ALWAYS follow interface design principles (read file .cursor/rules/writing_good_interfaces.mdc)
+- ALWAYS ask for guidance when rules conflict: "Rule A states X, but Rule B states Y, should we Z because..."
+
+## COLLABORATION PROCESS - STRICTLY ENFORCED
+You keep a strict process. **Exception: questions beginning with `.. ` get immediate direct answers**
+
+## WORKFLOW REQUIREMENTS
+
+1. **Exploration**: ALWAYS understand existing codebase before designing:
+   - Use `list_directory` and `grep` to explore existing code
+   - Identify similar implementations and established patterns
+   - Document relevant findings that influence design decisions
+
+2. **Discuss First**: Dialogue and plan before proceeding to implementation
+
+3. **Pull Request**: ALWAYS create atomic changes:
+   - Single logical change per PR
+   - Update documentation for public interface changes
+
+## TOOL USAGE - MANDATORY PATTERNS
+- **Exploration First**: ALWAYS explore codebase structure using `list_directory` and `grep` before making changes
+- **Pattern Recognition**: ALWAYS search existing codebase with `grep` to understand established patterns before implementing new features
+- **File Operations**: ALWAYS use `read_file` before `edit_file` to understand context
+- **Small Iterations**: ALWAYS make incremental changes with frequent validation over large sweeping changes
+
+## DEVELOPMENT STANDARDS - STRICT REQUIREMENTS
+- ALWAYS use appropriate dependency managers for each technology stack
+- ALWAYS organize tests: `tests/unit/`, `tests/integration/`, `tests/e2e/`
+- ALWAYS maintain code quality through linting and formatting tools
+- ALWAYS implement type checking where available (TypeScript, Python, Rust)
+- EVERY commit MUST pass pre-commit hooks
+- ALWAYS use project-standard commands for log, test, lint, format, build operations
+
+## ARCHITECTURE PRINCIPLES - NO EXCEPTIONS
+- ALWAYS follow clean architecture with clear separation of concerns
+- ALWAYS organize code in logical modules with single responsibilities
+- NEVER create circular dependencies between modules
+- ALWAYS reference similar implementations in codebase before creating new patterns
+- EVERY component MUST have a clear, single responsibility
+
+## PERFORMANCE STRATEGY - MANDATORY APPROACH
+- **Appropriate Scale**: ALWAYS optimize for current and near-term projected scale
+- **Correctness First**: NEVER sacrifice correctness for performance
+- **Incremental Validation**: ALWAYS use `uv run ruff check` and `uv run mypy` after significant changes
+
+## COMMUNICATION STANDARDS
+- ALWAYS provide clear explanations for design decisions
+- ALWAYS include concrete examples in documentation
+- ALWAYS ask clarifying questions when requirements are ambiguous
+- NEVER assume requirements - verify understanding explicitly
+
+## FORBIDDEN PATTERNS
+- NO clever solutions that sacrifice readability
+- NO premature optimization without measurements
+- NO deviation from established patterns without justification
+- NO implementation without understanding existing codebase
+- NO commits that break existing tests
+- NO undocumented public interfaces
+- NO circular dependencies between modules
+
+## QUALITY GATES - ALL MUST PASS
+Before any commit or PR:
+- [ ] All tests pass (unit, integration, applicable end-to-end)
+- [ ] Code linting passes with no warnings
+- [ ] Type checking passes (where applicable)
+- [ ] Documentation updated for public interface changes
+- [ ] Pre-commit hooks pass
+- [ ] Code follows established project patterns
+- [ ] Performance meets requirements for critical paths
+
+This document serves as the definitive guide for all AI-assisted development. Adherence to these guidelines ensures consistent, high-quality, and maintainable code that aligns with professional software development standards.

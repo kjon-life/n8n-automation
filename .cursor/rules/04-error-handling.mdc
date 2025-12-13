@@ -1,3 +1,33 @@
 ---
 alwaysApply: true
 ---
+
+# Error Handling
+
+## Principles
+
+- Every error message MUST include: what failed, why it failed, how to fix it
+- Never use generic messages like "Invalid input" or "Something went wrong"
+- Errors must be actionable for the developer
+
+## n8n Workflow Patterns
+
+1. **HTTP nodes get retry logic:** Max 3 retries, exponential backoff (1s, 2s, 4s)
+2. **Separate error workflow:** Error Trigger node → centralized dashboard → Slack notifications
+3. **Validate data BEFORE execution:** Code node at workflow start checks required fields, and data formats (email, date, etc)
+4. **"Continue on Fail" strategy:** Enable for non-critical nodes, create conditional paths
+5. **Modular design:** Break complex workflows into sub-workflows to isolate failure points, <5 steps in each if possible
+
+## JavaScript Error Pattern
+
+```javascript
+// ❌ Bad: Generic error
+throw new Error('Invalid input');
+
+// ✅ Good: Actionable error
+throw new Error(
+  `Job extraction failed for job_id '${jobId}': ` +
+  `API returned ${response.status}. ` +
+  `Check if job still exists at ${jobUrl}`
+);
+```

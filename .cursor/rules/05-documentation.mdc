@@ -2,7 +2,38 @@
 alwaysApply: true
 ---
 
-- documentation lives beside the code
-- define the purpose, structure and steps as succinctly as possible
-- code should be self-documenting and commented
-- readme should explain why the code exists, and what dependencies are non-obvious
+# Documentation Rules
+
+- Self-documenting code first, comments second, README last
+- Documentation lives beside the code it describes, never in a separate location
+- Document **why**, not **what** - code shows what it does
+- Skip docs for anything the code already expresses clearly
+- README answers: why it exists, non-obvious dependencies, how to start
+- Each workflow gets exactly two docs: README.md (why) and ACTIONS.md (steps)
+
+## Shell Script Pattern
+
+```bash
+#!/bin/bash
+# PURPOSE: Start n8n with all required environment configuration
+# REQUIRES: Node.js 24+, .venv directory exists
+# USAGE: ./start-n8n.sh
+
+# Why: n8n needs this symlink for Python task runner
+ln -sf /path/to/.venv node_modules/@n8n/task-runner-python/.venv
+```
+
+## JavaScript/n8n Code Node Pattern
+
+```javascript
+/**
+ * Filter jobs not yet applied to
+ * Why: X API returns all jobs, we only want new ones
+ * @param {Array} jobs - Raw jobs from X API
+ * @param {Set} appliedIds - Job IDs already in our database
+ * @returns {Array} Jobs not in appliedIds
+ */
+function filterNewJobs(jobs, appliedIds) {
+  return jobs.filter(job => !appliedIds.has(job.id));
+}
+```

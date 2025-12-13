@@ -1,0 +1,43 @@
+---
+description: Cross-language development standards - REQUIRED for all projects
+globs: **/*
+alwaysApply: true
+---
+
+# Development Standards - MANDATORY
+
+## BRANCH & COMMIT - MANDATORY FORMATS
+- Branch format: `feature/YYYY-MM-DD-brief-description` or `fix/YYYY-MM-DD-brief-description`
+- Commit format: `type(scope): subject` (conventional commits)
+- Every commit must be atomic (single logical change)
+- Never commit broken code or failing tests
+
+## SECURITY - NO EXCEPTIONS
+- NEVER hardcode secrets, API keys, or credentials in code
+- ALWAYS sanitize all user inputs before processing
+- EVERY external API call MUST include timeout and retry limits
+- ALWAYS use environment variables for configuration
+
+## RESOURCE MANAGEMENT - MANDATORY
+- HTTP Request nodes: always set timeout (default 30s, max 300s)
+- Large datasets: use pagination or Split In Batches node
+- External APIs: respect rate limits, add Wait nodes between calls if needed
+- Code nodes: avoid unbounded loops or recursive calls
+
+## FORBIDDEN PATTERNS
+- NO generic error messages without specific context
+- NO hardcoded configuration values
+- NO commits with FIXME comments
+- NO logging of sensitive data
+
+## WORKFLOW STANDARDS
+- Workflow names: lowercase-kebab-case (e.g., `job-hunter-discovery`)
+- Node names: describe what it does, not what it is (e.g., "Filter New Jobs" not "Code1")
+- Credentials: use n8n credential system, never hardcode in nodes
+- Always add Error Trigger workflow for production workflows
+
+## PRE-COMMIT REQUIREMENTS
+Before any commit or PR:
+- Documentation updated for public interface changes
+- No secrets or credentials in code
+- Workflow exports tested (if applicable)

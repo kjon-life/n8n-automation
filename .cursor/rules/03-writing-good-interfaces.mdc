@@ -1,0 +1,393 @@
+---
+description: Interface design standards - REQUIRED for all API and function design
+globs: **/*.ts,**/*.tsx,**/*.js,**/*.jsx
+alwaysApply: false
+---
+
+# Interface Design Standards - MANDATORY
+
+## FUNCTION DESIGN - STRICT REQUIREMENTS
+- EVERY function MUST do exactly one thing (single responsibility)
+- EVERY function MUST have descriptive names that explain what it does
+- NEVER create functions with more than 5 parameters (use objects/structs)
+- ALWAYS return the same type - NEVER mix return types based on conditions
+
+### REQUIRED Function Patterns
+
+```javascript
+// ✅ Good: Single responsibility, clear naming
+function calculateTotalPrice(items, discountRate) {
+  return items.reduce((total, item) => total + item.price, 0) * (1 - discountRate);
+}
+
+// ❌ Bad: Multiple responsibilities, mixed return types
+function processOrder(order) {
+  // Don't return string, Error, or void based on conditions
+}
+
+// ✅ Good: Consistent return type with result object
+function processOrder(order) {
+  // Always return the same result structure
+  return { success: true, data: processedOrder };
+}
+```
+
+## ERROR HANDLING - MANDATORY PATTERNS
+- EVERY error MUST include: what failed, why it failed, how to fix it
+- NEVER return generic errors like "Something went wrong"
+- ALWAYS use specific error types for different failure modes
+- EVERY error MUST be actionable for the caller
+
+### REQUIRED Error Patterns
+
+```javascript
+// ✅ Good: Specific, actionable errors
+class ValidationError extends Error {
+  constructor(field, value, expectedFormat) {
+    super(`Validation failed for field "${field}": received "${value}", expected ${expectedFormat}`);
+    this.name = 'ValidationError';
+    this.field = field;
+    this.value = value;
+    this.expectedFormat = expectedFormat;
+  }
+}
+
+// ✅ Good: Result pattern for clear error handling
+function parseUserInput(input) {
+  if (!input || typeof input !== 'string') {
+    return { success: false, error: new ValidationError('input', input, 'non-empty string') };
+  }
+  return { success: true, data: parsedUser };
+}
+```
+
+### n8n Code Node Error Pattern
+
+```javascript
+// ✅ Good: n8n code node with actionable errors
+const items = $input.all();
+
+if (!items || items.length === 0) {
+  throw new Error(
+    `No input items received: Expected array of items from previous node. ` +
+    `Check that the previous node is outputting data correctly.`
+  );
+}
+
+const item = items[0].json;
+if (!item.email) {
+  throw new Error(
+    `Missing required field 'email' in input item: ` +
+    `Received keys: ${Object.keys(item).join(', ')}. ` +
+    `Ensure the previous node includes 'email' in its output.`
+  );
+}
+```
+
+## IMMUTABILITY - STRICT REQUIREMENTS
+- ALWAYS prefer immutable data structures
+- NEVER mutate input parameters
+- ALWAYS return new objects instead of modifying existing ones
+- EVERY function that appears to modify data MUST return the new state
+
+### REQUIRED Immutability Patterns
+
+```javascript
+// ✅ Good: Returns new object, doesn't mutate input
+function addItem(cart, item) {
+  return {
+    ...cart,
+    items: [...cart.items, item],
+    total: cart.total + item.price
+  };
+}
+
+// ❌ Bad: Mutates input parameter
+function addItem(cart, item) {
+  cart.items.push(item); // Don't mutate inputs
+  cart.total += item.price;
+}
+```
+
+### n8n Code Node Immutability
+
+```javascript
+// ✅ Good: n8n code node with immutable transforms
+const items = $input.all();
+
+const transformed = items.map(item => ({
+  json: {
+    ...item.json,
+    processedAt: new Date().toISOString(),
+    status: 'processed'
+  }
+}));
+
+return transformed;
+
+// ❌ Bad: Mutating input items
+const items = $input.all();
+items.forEach(item => {
+  item.json.processedAt = new Date().toISOString(); // Don't mutate!
+});
+return items;
+```
+
+## PARAMETER DESIGN - MANDATORY RULES
+- ALWAYS use objects for functions with more than 3 parameters
+- ALWAYS provide default values for optional parameters
+- NEVER use boolean flags - use enums or specific methods instead
+- EVERY parameter MUST have a clear, unambiguous purpose
+
+### REQUIRED Parameter Patterns
+
+```javascript
+// ✅ Good: Object parameter for multiple values
+function createUser(options) {
+  const {
+    name,
+    email,
+    role = 'user',
+    isActive = true,
+    notifications = { email: true, sms: false }
+  } = options;
+  
+  // Implementation
+}
+
+// ✅ Good: Descriptive string instead of boolean flag
+const SortDirection = {
+  ASCENDING: 'asc',
+  DESCENDING: 'desc'
+};
+
+function sortUsers(users, direction) {
+  // Clear what the direction parameter does
+}
+
+// ❌ Bad: Boolean flag - unclear what true/false means
+function sortUsers(users, reverse) {
+  // Unclear what reverse=true means
+}
+```
+
+## API DESIGN - NO EXCEPTIONS
+- EVERY API endpoint MUST return consistent response format
+- NEVER expose internal implementation details in API responses
+- ALWAYS use proper HTTP status codes
+- EVERY API MUST handle all edge cases explicitly
+
+### REQUIRED API Response Patterns
+
+```javascript
+// ✅ Good: Consistent response wrapper
+function createApiResponse(success, data, error, meta) {
+  return {
+    success,
+    data: success ? data : undefined,
+    error: success ? undefined : {
+      code: error.code,
+      message: error.message,
+      details: error.details
+    },
+    meta: {
+      timestamp: new Date().toISOString(),
+      requestId: meta?.requestId
+    }
+  };
+}
+
+// ✅ Good: n8n HTTP Request node response handling
+const response = $input.first().json;
+
+if (response.error) {
+  throw new Error(
+    `API request failed with code ${response.error.code}: ${response.error.message}`
+  );
+}
+
+return [{
+  json: {
+    success: true,
+    data: response.data,
+    processedAt: new Date().toISOString()
+  }
+}];
+```
+
+## DEFENSIVE PROGRAMMING - MANDATORY
+- ALWAYS validate all inputs at function boundaries
+- NEVER assume inputs are valid without checking
+- ALWAYS provide meaningful default behaviors
+- EVERY public function MUST handle invalid inputs gracefully
+
+### REQUIRED Validation Patterns
+
+```javascript
+// ✅ Good: Input validation with clear errors
+function calculateDiscount(price, discountPercent) {
+  if (typeof price !== 'number' || price < 0) {
+    throw new Error(
+      `Invalid price: received ${typeof price} "${price}", expected positive number`
+    );
+  }
+  if (typeof discountPercent !== 'number' || discountPercent < 0 || discountPercent > 100) {
+    throw new Error(
+      `Invalid discountPercent: received "${discountPercent}", expected number between 0 and 100`
+    );
+  }
+
+  return price * (discountPercent / 100);
+}
+```
+
+### n8n Code Node Validation Pattern
+
+```javascript
+// ✅ Good: Validate at the start of n8n code nodes
+const items = $input.all();
+
+// Validate we have items
+if (!items || items.length === 0) {
+  throw new Error('No input items: Ensure previous node outputs data');
+}
+
+// Validate required fields
+const requiredFields = ['id', 'email', 'name'];
+const firstItem = items[0].json;
+const missingFields = requiredFields.filter(field => !(field in firstItem));
+
+if (missingFields.length > 0) {
+  throw new Error(
+    `Missing required fields: ${missingFields.join(', ')}. ` +
+    `Available fields: ${Object.keys(firstItem).join(', ')}`
+  );
+}
+
+// Now safe to process
+return items.map(item => ({
+  json: {
+    ...item.json,
+    validated: true
+  }
+}));
+```
+
+## DOCUMENTATION - STRICT REQUIREMENTS
+- EVERY public function MUST have documentation explaining its purpose
+- EVERY parameter MUST be documented with its expected type and purpose
+- EVERY return value MUST be documented
+- ALWAYS include usage examples for complex functions
+
+### REQUIRED Documentation Pattern
+
+```javascript
+/**
+ * Calculates the total price for a cart including taxes and discounts.
+ *
+ * @param {Array<{name: string, price: number}>} items - Array of items in the cart
+ * @param {number} taxRate - Tax rate as decimal (0.1 for 10% tax)
+ * @param {string} [discountCode] - Optional discount code to apply
+ * @returns {number} The final price including all adjustments
+ *
+ * @example
+ * const total = calculateCartTotal(
+ *   [{ name: 'Book', price: 20 }],
+ *   0.1,
+ *   'SAVE10'
+ * );
+ * console.log(total); // 18 (20 + 10% tax - 10% discount)
+ */
+function calculateCartTotal(items, taxRate, discountCode) {
+  // Implementation
+}
+```
+
+### n8n Code Node Documentation Pattern
+
+```javascript
+/**
+ * Filter jobs not yet applied to
+ * Why: External API returns all jobs, we only want new ones
+ * 
+ * Input: Array of job objects with 'id' field
+ * Output: Filtered array excluding jobs in appliedIds
+ * 
+ * @param {Array} jobs - Raw jobs from API (from previous node)
+ * @param {Set} appliedIds - Job IDs already in our database
+ * @returns {Array} Jobs not in appliedIds
+ */
+function filterNewJobs(jobs, appliedIds) {
+  return jobs.filter(job => !appliedIds.has(job.id));
+}
+
+// Usage in n8n code node:
+const jobs = $input.all().map(item => item.json);
+const appliedIds = new Set(['job-123', 'job-456']); // From database
+const newJobs = filterNewJobs(jobs, appliedIds);
+
+return newJobs.map(job => ({ json: job }));
+```
+
+## FORBIDDEN PATTERNS
+- NO functions that sometimes return different types
+- NO mutable parameters that are modified in place
+- NO boolean parameters (use enums or separate methods)
+- NO generic error messages without context
+- NO functions with side effects unless clearly named (like `saveUser()`)
+- NO exposing internal data structures in public APIs
+- NO functions with more than 5 parameters
+- NO undocumented public functions
+
+## TESTING INTERFACES
+- EVERY public function MUST be testable in isolation
+- EVERY interface MUST have examples of correct usage
+- EVERY error condition MUST be testable
+- ALWAYS design interfaces with testing in mind
+
+## n8n WORKFLOW INTERFACE PATTERNS
+
+### Code Node Input/Output Contract
+
+```javascript
+// ✅ Good: Clear input/output contract
+/**
+ * Transform API response to workflow format
+ * 
+ * Input: Single item with raw API response in json.data
+ * Output: Array of items, one per record
+ */
+const input = $input.first().json;
+
+if (!input.data || !Array.isArray(input.data)) {
+  throw new Error(
+    `Expected input.data to be array, got ${typeof input.data}. ` +
+    `Check HTTP Request node output format.`
+  );
+}
+
+return input.data.map(record => ({
+  json: {
+    id: record.id,
+    name: record.attributes.name,
+    email: record.attributes.email,
+    createdAt: record.attributes.created_at
+  }
+}));
+```
+
+### Workflow Data Flow Standards
+
+```javascript
+// ✅ Good: Consistent item structure across workflow
+// Each node should maintain this structure:
+return items.map(item => ({
+  json: {
+    // Original data preserved
+    ...item.json,
+    // New/transformed fields clearly named
+    _processedBy: 'transform-node',
+    _processedAt: new Date().toISOString()
+  }
+}));
+```
