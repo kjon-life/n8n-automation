@@ -1,35 +1,40 @@
 {
   "session": {
-    "started_at": null,
-    "last_updated": null,
-    "status": "not_started"
+    "started_at": "2025-12-13T20:55:00Z",
+    "last_updated": "2025-12-13T20:58:00Z",
+    "status": "in_progress"
   },
   "progress": {
-    "current_action": 0,
-    "current_step": null,
-    "next_step": "1.1",
-    "completed_actions": [],
-    "total_steps_completed": 0,
-    "estimated_completion": null
+    "current_action": 2,
+    "current_step": "2.1",
+    "next_step": "2.1",
+    "completed_actions": [1],
+    "total_steps_completed": 3,
+    "estimated_completion": "2025-12-13"
   },
   "accumulated_learnings": [
-    "Add learnings as you discover them"
+    "X Jobs page uses listitem role for job cards",
+    "Job cards contain: title, company, location (Remote), salary in name attribute",
+    "Filters display as tabs: 'Remote 1', 'Seniority 3' showing active filter count",
+    "Page loads with progress bars, need 3-5 sec wait for full content",
+    "User session persists across browser navigation"
   ],
   "known_selectors": {
-    "job_card": "TBD - discover during Action 2.1",
-    "job_title": "TBD",
-    "company_name": "TBD",
-    "location": "TBD",
-    "job_link": "TBD",
-    "apply_button": "TBD"
+    "job_card": "role: listitem (accessibility tree)",
+    "job_data": "name attribute of listitem contains: Title Company Location Salary",
+    "job_title": "Extracted from listitem name (first part)",
+    "company_name": "Extracted from listitem name (after title)",
+    "location": "Extracted from listitem name (contains 'Remote')",
+    "job_url_pattern": "https://x.com/m/jobs/{job_id}",
+    "job_id_extraction": "Click listitem -> extract from URL path"
   },
   "environment": {
-    "n8n_running": false,
+    "n8n_running": true,
     "n8n_url": "http://localhost:5678",
-    "browser_tools_connected": false,
+    "browser_tools_connected": true,
     "files_writable": true,
     "disk_space_ok": true,
-    "last_health_check": null
+    "last_health_check": "2025-12-13T20:58:00Z"
   },
   "known_issues": []
 }

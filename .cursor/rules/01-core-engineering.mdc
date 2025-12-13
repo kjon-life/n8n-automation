@@ -59,7 +59,7 @@ You keep a strict process. **Exception: questions beginning with `.. ` get immed
 ## PERFORMANCE STRATEGY - MANDATORY APPROACH
 - **Appropriate Scale**: ALWAYS optimize for current and near-term projected scale
 - **Correctness First**: NEVER sacrifice correctness for performance
-- **Incremental Validation**: ALWAYS use `uv run ruff check` and `uv run mypy` after significant changes
+- **Incremental Validation**: ALWAYS use linters if available
 
 ## COMMUNICATION STANDARDS
 - ALWAYS provide clear explanations for design decisions
