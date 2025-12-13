@@ -1,0 +1,204 @@
+---
+alwaysApply: true
+---
+
+# n8n 2.0 Documentation Ontology
+
+**Version**: 2.0.1 (released December 5, 2024)  
+**Purpose**: Direct navigation map to current n8n 2.0 documentation
+
+---
+
+## Core Resources
+
+### Breaking Changes & Migration
+- **2.0 Breaking Changes**: https://docs.n8n.io/2-0-breaking-changes/
+  - Task runners architecture
+  - Security defaults (env access, git repos)
+  - Removed features (Python Code node via npm)
+  - Migration requirements
+
+### Release Information
+- **Release Notes**: https://docs.n8n.io/release-notes/
+  - Version-specific changes
+  - Feature additions
+  - Bug fixes per version
+
+- **2.0 Announcement**: https://blog.n8n.io/introducing-n8n-2-0/
+  - Rationale for changes
+  - Strategic direction
+  - High-level overview
+
+---
+
+## Task Runners (New in 2.0)
+
+### Core Concepts
+- **Task Runners Overview**: https://docs.n8n.io/hosting/scaling/task-runners/
+  - Architecture change from embedded execution
+  - Internal vs external modes
+  - Configuration requirements
+
+### JavaScript Runner
+- **JavaScript Task Runner**: https://docs.n8n.io/hosting/scaling/task-runners/task-runner-js/
+  - Setup and configuration
+  - Environment variables
+  - Troubleshooting
+
+### Python Runner
+- **Python Task Runner**: https://docs.n8n.io/hosting/scaling/task-runners/task-runner-python/
+  - Virtual environment setup
+  - Package management
+  - Limitations (no npm install path)
+
+---
+
+## Code Nodes
+
+### JavaScript
+- **Code Node**: https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/
+  - Syntax and examples
+  - Available libraries
+  - Limitations (external module access)
+
+### Python (Deprecated Path)
+- **Python Code Node Removal**: See 2.0 Breaking Changes
+  - No longer installable via npm
+  - Alternative: External Python task runner only
+
+---
+
+## Environment & Configuration
+
+### Environment Variables
+- **Environment Variables Reference**: https://docs.n8n.io/hosting/configuration/environment-variables/
+  - Complete list of variables
+  - Task runner specific settings
+  - Security flags
+
+### Database
+- **Database Configuration**: https://docs.n8n.io/hosting/configuration/database/
+  - SQLite setup (default)
+  - PostgreSQL migration
+  - Connection pooling
+
+---
+
+## Security (Changed in 2.0)
+
+### Default Security Settings
+- **Security Best Practices**: https://docs.n8n.io/hosting/security/
+  - Environment variable blocking (`N8N_BLOCK_ENV_ACCESS_IN_NODE`)
+  - Git repository protections (`N8N_GIT_NODE_DISABLE_BARE_REPOS`)
+  - Credential encryption
+
+---
+
+## API & CLI
+
+### REST API
+- **API Documentation**: https://docs.n8n.io/api/
+  - Workflow endpoints
+  - Execution endpoints
+  - Credential management
+  - Authentication (local vs production)
+
+### Command Line
+- **CLI Commands**: https://docs.n8n.io/hosting/cli-commands/
+  - Workflow import/export
+  - User management
+  - Database operations
+
+---
+
+## Integrations
+
+### X (Twitter) Integration
+- **X Node Documentation**: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.twitter/
+  - Available operations
+  - OAuth setup requirements
+
+- **X Credentials**: https://docs.n8n.io/integrations/builtin/credentials/twitter/
+  - OAuth 2.0 setup (OAuth 1.0a deprecated)
+  - API key configuration
+  - Callback URL requirements
+
+### Core Nodes
+- **Core Nodes Index**: https://docs.n8n.io/integrations/builtin/core-nodes/
+  - HTTP Request, Webhook, Schedule, etc.
+  - Code node alternatives
+
+---
+
+## Self-Hosting
+
+### Installation
+- **Installation Guide**: https://docs.n8n.io/hosting/installation/
+  - npm installation
+  - Docker alternatives
+  - System requirements
+
+### Scaling
+- **Scaling n8n**: https://docs.n8n.io/hosting/scaling/
+  - Queue mode
+  - Task runner configuration
+  - Worker processes
+
+---
+
+## Troubleshooting
+
+### Common Issues
+- **Troubleshooting Guide**: https://docs.n8n.io/hosting/troubleshooting/
+  - Task runner failures
+  - Database connection issues
+  - Memory/performance problems
+
+### Logs
+- **Logging Configuration**: https://docs.n8n.io/hosting/configuration/logging/
+  - Log levels
+  - Scope filtering
+  - Output destinations
+
+---
+
+## Community Resources
+
+- **n8n Forum**: https://community.n8n.io/
+  - Community Q&A
+  - Workflow templates
+  - Feature requests
+
+- **GitHub Repository**: https://github.com/n8n-io/n8n
+  - Source code
+  - Issue tracking
+  - Contribution guidelines
+
+---
+
+## Quick Reference Paths
+
+```
+Breaking Changes    → /2-0-breaking-changes/
+Task Runners        → /hosting/scaling/task-runners/
+Environment Vars    → /hosting/configuration/environment-variables/
+API Reference       → /api/
+CLI Commands        → /hosting/cli-commands/
+X Integration       → /integrations/builtin/app-nodes/n8n-nodes-base.twitter/
+Security Settings   → /hosting/security/
+```
+
+**Base URL**: https://docs.n8n.io
+
+---
+
+## Search Strategy for Agents
+
+1. **Known category?** → Use Quick Reference Paths above
+2. **Task runner issue?** → Start at `/hosting/scaling/task-runners/`
+3. **Node-specific question?** → Go to `/integrations/builtin/`
+4. **Configuration/env var?** → Check `/hosting/configuration/environment-variables/`
+5. **Breaking change concern?** → Read `/2-0-breaking-changes/` first
+6. **Unknown?** → Search docs.n8n.io site or check release notes
+
+**Last updated**: December 13, 2024

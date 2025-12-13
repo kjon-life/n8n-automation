@@ -10,6 +10,7 @@ Before doing ANY development work, coding, or answering technical questions abou
 2. **Use the `Read` tool** (never batch read multiple rules files)
 3. **Read them in numerical order**: 00, 01, 02, ... 09
 4. **Complete each read** before starting the next one
+5. **use only current documentation** release DEC 5, 2025 or later
 
 ### Required Reading Order
 
@@ -29,6 +30,7 @@ Before doing ANY development work, coding, or answering technical questions abou
 8. Read: .cursor/rules/07-project-setup.mdc       # n8n project structure
 9. Read: .cursor/rules/08-start-stop-update.mdc   # n8n operations
 10. Read: .cursor/rules/09-browser-tools-workflows.mdc # Browser tools & workflows
+11. Read .cursor/rules/10-n8n-v2-resources.mdc    # n8n version 2.0.1 ESSENTIAL documentation
 ```
 
 ### Why This Matters
