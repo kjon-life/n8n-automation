@@ -88,25 +88,30 @@
 
 ### Data Schema
 
+**Pending Jobs (After Discovery)**:
 ```json
 {
   "job_id": "1949931048101466191",
-  "title": "Senior Python Developer",
-  "company": "TechCorp",
-  "posted_date": "2025-12-13",
-  "url": "https://x.com/jobs/1949931048101466191",
   "discovered_at": "2025-12-13T15:30:00Z",
-  "status": "pending"
+  "title": "Python Developer",
+  "company": "Aloha Protocol",
+  "url": "https://x.com/m/jobs/1949931048101466191",
+  "location": "Remote",
+  "salary_range": "€60K - €80K per year"
 }
 ```
+
+**Scripts**: `parse-jobs-from-snapshot.js`, `filter-new-jobs.js`
 
 ---
 
 ## Action 3: Job Extraction
 
-**Purpose:** Capture full job details for each pending job  
+**Purpose:** Capture job details for each pending job  
 **Automation:** Full  
 **Trigger:** Pending jobs exist in queue
+
+**⚠️ Known Limitation (Blocker #1):** X Jobs detail pages expose minimal content via accessibility API. Full descriptions, requirements, and benefits are not available. See `UPDATE-GUIDE.md` for planned solution.
 
 ### Steps
 
@@ -114,50 +119,78 @@
    - Input: `data/pending_jobs.json`
    - Process: Read and parse
    - Output: Array of jobs to process
+   - Script: `scripts/parse-jobs-from-snapshot.js`
 
 2. **Navigate to job detail page**
    - Input: Job URL
-   - Process: Browser navigates to job posting
-   - Output: Job detail page loaded
+   - Process: Browser navigates to job posting, click job card
+   - Output: Job detail page loaded, real job_id extracted from URL
 
-3. **Extract full job data**
-   - Input: Job detail DOM
-   - Process: Parse description, requirements, salary, company info, apply link
-   - Output: Complete job object
+3. **Extract available job data**
+   - Input: Job detail DOM (accessibility tree)
+   - Process: Parse basic info (title, company, location, salary, apply URL)
+   - Output: Job object with available fields
+   - Script: `scripts/batch-extract-job-ids.js`
 
 4. **Save extract to file**
-   - Input: Complete job object
+   - Input: Job object with metadata
    - Process: Write to `data/extracts/{job_id}.json`
    - Output: Persisted job extract
+   - Note: Extract includes X Jobs URL for manual review
 
 ### Success Criteria
 
 - [ ] Extract file created for each job
-- [ ] All required fields captured (description, requirements, apply_url)
+- [ ] Basic fields captured (job_id, title, company, location, salary, apply_url)
+- [ ] X Jobs URL included for user to view full details
 
 ### Error Handling
 
 - **If page doesn't load:** Mark job as "error", skip to next
-- **If required field missing:** Log warning, save partial data
+- **If job_id extraction fails:** Use temp ID, mark for manual review
+- **If minimal data:** Accept limitation, save what's available + URL
 
 ### Data Schema (Extract)
 
+**Current Schema (Minimal Data)**:
 ```json
 {
   "job_id": "1949931048101466191",
-  "title": "Senior Python Developer",
-  "company": "TechCorp",
-  "location": "Remote (US)",
-  "salary_range": "$150k - $180k",
-  "description": "Full job description text...",
-  "requirements": ["Python 5+ years", "FastAPI", "PostgreSQL"],
-  "nice_to_have": ["Kubernetes", "AWS"],
-  "benefits": ["Health", "401k", "Unlimited PTO"],
-  "apply_url": "https://techcorp.com/careers/12345",
-  "posted_date": "2025-12-13",
-  "extracted_at": "2025-12-13T15:45:00Z"
+  "extracted_at": "2025-12-13T21:24:00Z",
+  "basic": {
+    "title": "Python Developer",
+    "company": "Aloha Protocol",
+    "location": "Remote",
+    "type": "Full-time",
+    "salary_range": "€60K - €80K per year",
+    "posted_date": "Unknown"
+  },
+  "details": {
+    "description": "Brief tagline only",
+    "requirements": [],
+    "nice_to_have": [],
+    "benefits": []
+  },
+  "application": {
+    "apply_url": "https://x.com/m/jobs/1949931048101466191",
+    "x_jobs_url": "https://x.com/m/jobs/1949931048101466191",
+    "deadline": null,
+    "company_url": "https://x.com/AlohaProtocol"
+  },
+  "metadata": {
+    "extraction_method": "Browser accessibility tree",
+    "extraction_notes": "X Jobs detail page has limited exposed content. Full description requires alternative method.",
+    "verified": false
+  }
 }
 ```
+
+**Future Schema (With Full Extraction)**:
+See `UPDATE-GUIDE.md` Blocker #1 for planned enhancement to extract:
+- Full job description
+- Detailed requirements list
+- Nice-to-have skills
+- Benefits and perks
 
 ---
 
@@ -185,9 +218,11 @@
    - Output: List of concerns (if any)
 
 4. **Generate application materials**
-   - Input: Job description, resume, fit analysis
-   - Process: AI generates tailored cover letter points, talking points
+   - Input: Job extract (basic info), resume, fit analysis
+   - Process: Generate tailored cover letter points and strategy
    - Output: `data/applications/{job_id}.md`
+   - Script: `scripts/evaluate-job-fit.js`
+   - Note: Works with minimal job data; AI infers from title/company/salary
 
 ### Success Criteria
 
@@ -250,14 +285,16 @@
    - Output: Application submitted
 
 3. **Record application**
-   - Input: Job ID, application date
+   - Input: Job ID, application date, notes
    - Process: Move from `pending_jobs.json` to `applied_jobs.json`
    - Output: Tracking updated
+   - Script: `scripts/track-application.js record <job_id> [notes]`
 
 4. **Set follow-up reminder**
    - Input: Application date
-   - Process: Create reminder for 1 week follow-up
-   - Output: Reminder scheduled
+   - Process: Create reminder for 7 days follow-up (automatic)
+   - Output: Reminder scheduled with follow_up_date
+   - Check: `scripts/track-application.js follow-ups`
 
 ### Success Criteria
 
@@ -275,15 +312,22 @@
 ```json
 {
   "job_id": "1949931048101466191",
-  "title": "Senior Python Developer",
-  "company": "TechCorp",
-  "applied_date": "2025-12-13",
-  "status": "applied",
-  "follow_up_date": "2025-12-20",
-  "notes": "Strong fit, mentioned FastAPI project",
+  "discovered_at": "2025-12-13T15:30:00Z",
+  "applied_at": "2025-12-13T21:17:00Z",
+  "title": "Python Developer",
+  "company": "Aloha Protocol",
+  "url": "https://x.com/m/jobs/1949931048101466191",
+  "location": "Remote",
+  "salary_range": "€60K - €80K per year",
+  "application_method": "X Jobs Form",
+  "status": "submitted",
+  "follow_up_date": "2025-12-20T00:00:00Z",
+  "notes": "Strong fit for Python/AI work. Applied via X Jobs.",
   "response": null
 }
 ```
+
+**Status Values**: `submitted` | `interviewing` | `rejected` | `offer`
 
 ---
 
@@ -302,13 +346,22 @@
 
 ```bash
 # Check pending jobs count
-cat workflows/job-hunter/data/pending_jobs.json | jq length
+cat workflows/job-hunter/data/pending_jobs.json | jq '.jobs | length'
 
 # Check applied jobs
-cat workflows/job-hunter/data/applied_jobs.json | jq '.[].company'
+cat workflows/job-hunter/data/applied_jobs.json | jq '.jobs[].company'
 
 # View specific extract
 cat workflows/job-hunter/data/extracts/1949931048101466191.json | jq
+
+# Evaluate job
+node workflows/job-hunter/scripts/evaluate-job-fit.js data/extracts/1949931048101466191.json
+
+# Check follow-ups
+node workflows/job-hunter/scripts/track-application.js follow-ups
+
+# Record application
+node workflows/job-hunter/scripts/track-application.js record 1949931048101466191 "Notes here"
 ```
 
 ### Manual Intervention Points
