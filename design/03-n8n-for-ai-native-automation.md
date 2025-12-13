@@ -195,3 +195,116 @@ See you in production,
 
 {k}
 
+The way we did this until mid-2025 is in `design/02-build-job-hunter.md`
+
+## The gaps in context...
+...between prompt and workflow.
+
+Missing: Autonomous Decision Framework
+Add explicit decision boundaries:
+Missing: Progress Tracking System
+Add persistent state tracking:
+Missing: Data Schemas & Validation
+Add explicit schemas:
+Missing: Error Recovery Playbook
+Add specific recovery procedures:
+Missing: Quality Gates (Beyond "Works")
+Add measurable success criteria:
+Missing: Check-in Protocol
+Add structured reporting intervals:
+Missing: Context Preservation Between Sessions
+Add session continuity:
+Missing: Integration Contract Between Actions
+Add explicit data flow:
+Missing: Working Code Examples
+Add concrete patterns:
+Missing: Rollback Procedure
+Add safety nets:
+
+Recommendations:
+
+Add all above sections to the prompt
+Create template files for PROGRESS.md and .context.json
+Define X-specific selectors (requires reconnaissance of actual page)
+Add timeout budgets per action (e.g., "Action 2 should take 10-20min max")
+Create validation scripts agent can run: ./scripts/validate-data.sh
+Add test data for offline testing (mocked pending_jobs.json, etc.)
+Define commit message format: [Action X.Y] Description
+
+The prompt is well-structured for human guidance but lacks the defensive programming, error boundaries, and autonomous decision framework needed for unattended agent execution. Add these elements and the agent can operate for hours with only strategic check-ins.
+
+So we completed these steps within the workflow:
+Recommendation 1: Add Autonomous Decision Framework. 
+    created comprehensive `BUILD-GUIDE.md`
+    BUILD-GUIDE.md - Autonomous Agent Framework
+        Full agent authority boundaries (CAN/MUST ASK/MUST STOP)
+        Error recovery playbook with specific procedures
+        Quality gates per step with measurable criteria
+        Check-in protocol (after action, mid-block, daily summary)
+        Integration contracts between actions with TypeScript schemas
+        Working code examples for n8n nodes
+        Rollback procedures with git checkpoints
+        Added "Action Time Budgets" section to BUILD-GUIDE.md
+        Includes:
+            High-level action budgets (5-30 minutes)
+            Per-step granular budgets (1-20 minutes)
+            Budget overrun protocol (2x = blocked, 3x = STOP)
+            Common causes of delays
+        Added "Git Commit Format" section to BUILD-GUIDE.md
+        Includes:
+            Standard format: [Action X.Y] Brief description
+            Examples for all commit types (actions, steps, checkpoints, fixes, infra)
+            Guidelines (present tense, specific, <72 chars)
+            When to commit (required vs optional)
+            Bad examples with explanations
+Step 2: Create `PROGRESS.md` template
+    PROGRESS.md - Progress Tracking Template
+        Current state tracking
+        Completed steps with timestamps
+        Decisions log
+        Issues tracker
+        Learnings about X's UI
+        Session history format
+Step 3: Create `.context.json` template
+    .context.json - Session Continuity
+        Session metadata
+        Progress state
+        Accumulated learnings array
+        Known selectors (placeholders for discovery)
+        Environment health checks
+        Known issues tracker
+Step 4: Define X-specific selectors (requires reconnaissance of actual page)
+Step 5: Add timeout budgets per action (e.g., "Action 2 should take 10-20min max")
+Step 6: Create necessary directories
+    ```markdown
+    workflows/job-hunter/
+    ├── data/
+    │   ├── .backups/          ✅ Created
+    │   ├── applications/      ✅ Created
+    │   ├── extracts/          ✅ Created
+    │   ├── pending_jobs.json  ✅ Initialized (empty)
+    │   └── applied_jobs.json  ✅ Initialized (empty)
+    ├── scripts/
+    │   └── validate-data.sh   ✅ Created
+    └── debug/                 ✅ Created
+    ```
+Step 7: Create validation scripts agent can run: `./scripts/validate-data.sh`
+    scripts/validate-data.sh - Validation Script
+        File existence checks
+        JSON syntax validation
+        Schema version verification
+        Duplicate detection (within and across files)
+        Required fields validation
+        URL format validation
+        File size sanity checks
+        Statistics reporting
+Step 8: Add test data for offline testing (mocked pending_jobs.json, etc.)
+    Added 3 sample jobs to `pending_jobs.json`
+    Added 2 sample jobs to `applied_jobs.json`
+    Both files now have proper schema structure with version, updated_at, and jobs array
+Step 9: Define commit message format: `[Action X.Y] Description`
+
+### And we can close those gaps...
+...with autonomous agents.
+
+`design/05-autonomous-agent-execution.md`
