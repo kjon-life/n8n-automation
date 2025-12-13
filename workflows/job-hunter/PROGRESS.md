@@ -1,11 +1,11 @@
 # Job Hunter Build Progress
 
 ## Current State
-- **Active Action**: 3 (Job Extraction)
-- **Active Step**: 3.1 (Load Pending Jobs)
-- **Status**: In Progress
-- **Last Updated**: 2025-12-13 15:03 CST
-- **Blockers**: Job IDs are temporary - need to click through to get real IDs
+- **Active Action**: 3 (Job Extraction) - Paused for review
+- **Active Step**: 3.4 (Extract Full Details) - 1 of 25 complete
+- **Status**: Blocked - X Jobs API limitations
+- **Last Updated**: 2025-12-13 15:25 CST
+- **Blockers**: X Jobs detail pages have minimal exposed content in accessibility API
 
 ## Completed Steps
 - [x] 1.1 Navigate to X.com (2025-12-13 14:55) - 3min
@@ -15,6 +15,10 @@
 - [x] 2.2 Load applied jobs database (2025-12-13 15:01) - 1min (2 applied jobs)
 - [x] 2.3 Filter new jobs (2025-12-13 15:02) - 1min (25 new, 0 duplicates)
 - [x] 2.4 Save to pending queue (2025-12-13 15:03) - 1min
+- [x] 3.1 Load pending jobs (2025-12-13 15:22) - 1min
+- [x] 3.2-3.4 Extract first job details (2025-12-13 15:25) - 3min
+  - Real job_id: 1949931048101466191
+  - Extract saved to: data/extracts/1949931048101466191.json
 
 ## Decisions Made
 
@@ -31,12 +35,17 @@
    - Purpose: Test logic before building n8n workflow nodes
 
 ## Issues Encountered
-_Track problems and solutions_
 
-Format:
-1. **Issue description**
-   - Solution: [What fixed it]
-   - Impact: [How it affects the workflow]
+1. **X Jobs detail pages expose minimal content via accessibility API**
+   - Problem: Job descriptions, requirements, benefits not in accessibility tree
+   - Attempted: Page navigation, scrolling, clicking "Apply now"
+   - Finding: X Jobs may not expose full job details, or requires HTML parsing
+   - Impact: Extracts will have limited detail (title, company, salary only)
+   - Potential solutions:
+     a) Accept minimal data and rely on X Jobs URL for user review
+     b) Use HTML parsing instead of accessibility API (more brittle)
+     c) Check if X has a Jobs API (unlikely for third-party access)
+   - Decision needed: Continue with minimal extracts or investigate alternatives?
 
 ## Learnings About X's UI
 
