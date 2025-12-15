@@ -8,9 +8,9 @@
 
 The first article showed how to structure n8n for AI-assisted development. Browser tools. Clear rules. Action-based workflows. That works. Almost anyone can build actions in hours, not days.
 
-But "assisted" means you're watching. You answer questions. You unstick it when it glitches.
+But "assisted" means I'm watching. I answer questions. I unstick it when it glitches. I run the train and build the track at the same time.
 
-We want autonomous. Specify the outcome. Start the agent Friday evening, wake up Saturday morning to use the workflow.
+We want autonomous. Specify the outcome. Start the agent Friday evening, wake up Saturday morning to use the workflow. Re-use the agent next week and it just works.
 
 That's a different problem.
 
