@@ -50,8 +50,49 @@
 
 ---
 
-## Article 2: From Assisted to Autonomous
-**Focus:** Bridging gap from "you watch" to "agent works alone"
+## Article 2: The Valley Between Scripts and Shipping
+**Focus:** Implementation gap - scripts that work vs workflows that ship
+
+### Key Sections
+1. **The Scripts Work**
+   - Five actions complete and proven
+   - One job processed end-to-end
+   - Not shipping yet
+
+2. **What We Built vs What Ships**
+   - Scripts: standalone, manual, terminal-based
+   - Production: n8n workflow, scheduled, automated
+
+3. **The Valley**
+   - Implementation debt between prototype and production
+   - Most teams stop at scripts
+
+4. **Why Teams Stop**
+   - Scripts feel done but require manual execution
+   - No error recovery, no scheduling, no visibility
+
+5. **Crossing the Valley: Four Bridges**
+   - Convert scripts → n8n nodes (2-3 hours)
+   - Batch processing (10 minutes)
+   - Error recovery workflow (1 hour)
+   - Schedule + observe (30 minutes)
+
+6. **What Changes**
+   - Before/after comparison table
+   - Cost to cross: 4 hours
+   - Cost to not cross: permanent prototype
+
+7. **Production Readiness Checklist**
+   - 7 requirements, currently at 3/7
+
+8. **What Autonomous Actually Means**
+   - Not "AI does everything"
+   - System runs without human supervision
+
+---
+
+## Article 3: Autonomous Agent Framework
+**Focus:** Bridging gap from "you watch" to "agent works alone" (theoretical)
 
 ### Key Sections
 1. **The Gap Nobody Talks About**
@@ -115,5 +156,24 @@
 - Solution: Make human judgment explicit
 - Result: Unattended execution overnight
 
-**Progression:** Setup → Structure → Protocol → Autonomous Operation
+**Progression:** Setup → Structure → Implementation → Framework → Autonomous Operation
+
+---
+
+## Series Organization
+
+**Article 1 (03):** Foundation - n8n for AI-Native Automation
+- Problem: Old patterns don't work
+- Solution: Design environment for assistants
+- Result: Assisted development in hours
+
+**Article 2 (05):** Implementation - The Valley Between Scripts and Shipping
+- Problem: Scripts work but don't ship
+- Solution: Cross the valley with 4 bridges
+- Result: Production-ready workflows
+
+**Article 3 (06):** Framework - Autonomous Agent Execution
+- Problem: Assisted ≠ Autonomous
+- Solution: 9 additions that enable autonomy
+- Result: Unattended execution overnight
 
