@@ -1,22 +1,22 @@
 # From Assisted to Autonomous: Building Agents That Ship
 
-**TL;DR:** I built an n8n workflow with AI assistance in hours. Then I tried to let the agent work unattended. It got stuck. A lot. The gap between "assistant helps you build" and "agent builds while you sleep" is real. Here's what I added to close it.
+**TL;DR:** We build n8n workflows for ai-native systems. You might think we can let the agents work unattended. They get stuck. A lot. The gap between "assistant helps me build" and "agent builds while I sleep" is real. Here's what we add to close it.
 
 ---
 
 ## The Gap Nobody Talks About
 
-The first article showed how to structure n8n for AI-assisted development. Browser tools. Clear rules. Action-based workflows. It worked. Actions built in hours, not days.
+The first article showed how to structure n8n for AI-assisted development. Browser tools. Clear rules. Action-based workflows. That works. Almost anyone can build actions in hours, not days.
 
-But "assisted" means you're watching. You answer questions. You unstick it when it hesitates.
+But "assisted" means you're watching. You answer questions. You unstick it when it glitches.
 
-I wanted autonomous. Start the agent Friday evening, wake up Saturday to working code.
+We want autonomous. Specify the outcome. Start the agent Friday evening, wake up Saturday morning to use the workflow.
 
 That's a different problem.
 
 ---
 
-## What Breaks When You're Not Watching
+## What Breaks When We're Not Watching
 
 Ran the experiment. Left detailed instructions. Came back to find:
 
@@ -302,9 +302,9 @@ That excuse is gone.
 
 ---
 
-## What You Need
+## What We Need
 
-If you're building autonomous agents:
+If we're building autonomous agents:
 
 1. **Decision framework:** What can it decide alone?
 2. **Recovery playbook:** What to do when things break?
