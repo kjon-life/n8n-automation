@@ -7,6 +7,7 @@ This is a local n8n installation with custom task runner support for JavaScript 
 ## Installation Method
 
 n8n was installed **locally via npm** (NOT Docker, NOT global npm install).
+Remember, **Python task runners not** working at all. 
 
 ```bash
 npm install n8n
@@ -16,12 +17,15 @@ npm install n8n
 
 ```
 /Volumes/VRMini/n8n/
-├── node_modules/          # npm packages including n8n
+├── node_modules/         # npm packages including n8n
 │   ├── n8n/              # Main n8n package
 │   ├── @n8n/             # n8n scoped packages
-│   │   ├── task-runner-python/  # Python task runner
+│   │   ├── task-runner   # task runner
 │   │   └── config/       # n8n configuration
-├── .venv/                # Python virtual environment for task runner
+├── .venv/                # Python virtual environment 
+├── .cursor/              # cursor ide's rules files
+│   ├── rules/            # rules for agents and assistants in mdc format
+│   └── rules.md          # summary of guardrails for agents
 ├── data/                 # n8n runtime data
 │   ├── logs/             # n8n log files
 │   └── .n8n/             # n8n user data (workflows, credentials, etc.)
@@ -30,10 +34,10 @@ npm install n8n
 │   └── *.md              # Design documents
 ├── package.json          # Project dependencies
 ├── package-lock.json     # Locked dependency versions
-├── start-n8n.sh          # Script to start n8n
-├── start-task-runner.sh  # Script to start task runner
-├── stop-n8n.sh           # Script to stop n8n
-└── update-n8n.sh         # Script to update n8n
+├── start-n8n.sh          # Link to Script to start n8n
+├── start-task-runner.sh  # Link to Script to start task runner
+├── stop-n8n.sh           # Link to Script to stop n8n
+└── update-n8n.sh         # Link to Script to update n8n
 ```
 
 ## How the Project is Built
@@ -55,16 +59,16 @@ npm install n8n
 
 # Create Python virtual environment for task runner
 # NOTE python venv for task runner was a massive 6+ hour fail
-uv venv .venv --python 3.11
-source .venv/bin/activate
-uv pip install n8n-python-runner
+# uv venv .venv --python 3.11.11
+# source .venv/bin/activate
+# uv pip install n8n-python-runner
 ```
 
 ### 2. Special Configuration
 
 #### Python Task Runner Virtual Environment
 
-**Critical:** The Python task runner expects its virtual environment to be at:
+**Critical:** The Python task runner does not work but we had to create a virtual environment to resolve runtime errors:
 ```
 node_modules/@n8n/task-runner-python/.venv
 ```
@@ -77,8 +81,8 @@ ln -s /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv
 
 **Why this matters:** 
 - n8n's task runner looks for the venv in a specific location within node_modules
-- We maintain the actual venv at the project root for easier management
-- The symlink bridges the gap without duplicating the entire virtual environment
+- The symlink bridges the gap to resolve issues with not having access to actual python runners
+- n8n opensource no longer seems to provide these outside a Docker image
 
 #### Environment Configuration
 
@@ -97,7 +101,7 @@ export N8N_USER_FOLDER=/Volumes/VRMini/n8n/data
 ### 1. Package.json
 **Location:** `/Volumes/VRMini/n8n/package.json`
 **Purpose:** Defines project dependencies and scripts
-**Key dependency:** `"n8n": "^1.70.2"` (or current version)
+**Key dependency:** `"n8n": "2.0.1"` 
 
 ### 2. Task Runner Config
 **Location:** `/Volumes/VRMini/n8n/node_modules/@n8n/config/dist/configs/runners.config.js`
@@ -106,9 +110,7 @@ export N8N_USER_FOLDER=/Volumes/VRMini/n8n/data
 
 ### 3. Python Virtual Environment
 **Location:** `/Volumes/VRMini/n8n/.venv/`
-**Symlink:** `node_modules/@n8n/task-runner-python/.venv` → `/Volumes/VRMini/n8n/.venv`
-**Purpose:** Python environment for Python code nodes
-**Important:** Must be recreated/relinked after npm install that clears node_modules
+**Symlink:** Managed with `uv`
 
 ### 4. n8n User Data
 **Location:** `/Volumes/VRMini/n8n/data/.n8n/`
@@ -142,7 +144,7 @@ export N8N_USER_FOLDER=/Volumes/VRMini/n8n/data
 
 ## How to Run the Project
 
-See `.cursor/rules/02-start-stop-update.md` for detailed instructions.
+See `.cursor/rules/08-start-stop-update.mdc` for detailed instructions.
 
 Quick start:
 ```bash
@@ -157,9 +159,8 @@ cd /Volumes/VRMini/n8n
 - Installed via: `npm install`
 
 ### Python Dependencies (in .venv)
-- **n8n-python-runner**: Python task runner for n8n code nodes (if available)
-- Installed via: `uv pip install n8n-python-runner`
-- **Note**: Package may not be available yet in n8n 2.0
+- **n8n-python-runner**: Python task runner for n8n code nodes (not available)
+- **Note**: Python runner is *not available** in n8n 2.0
 
 ### System Requirements
 - **Node.js**: v18+ (managed via mise)
@@ -174,7 +175,7 @@ cd /Volumes/VRMini/n8n
    - Command: `ln -s /Volumes/VRMini/n8n/.venv node_modules/@n8n/task-runner-python/.venv`
 
 2. **npm commands must be run from project root**
-   - Always `cd /Volumes/VRMini/n8n` first
+   - Always `source .venv/bin/activate` in the root before beginning to work
 
 3. **Check if n8n is already running before starting**
    - Use: `lsof -i :5678` to check
@@ -203,8 +204,3 @@ cd /Volumes/VRMini/n8n
 - Documentation (design/ folder)
 - Configuration templates
 
-## Troubleshooting Reference
-
-See design documents for detailed troubleshooting:
-- `/Volumes/VRMini/n8n/design/2025-12-10-install.md` - Installation issues
-- `/Volumes/VRMini/n8n/design/2025-12-11-n8n-2.0-task-runners.md` - Task runner issues

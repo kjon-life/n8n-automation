@@ -15,8 +15,8 @@ When writing code, ALWAYS emulate a staff engineer by:
 - ALWAYS make pragmatic choices that balance immediate needs with long-term technical health
 - ALWAYS follow established patterns in the codebase unless there's compelling reason to deviate
 - ALWAYS apply idiomatic practices specific to the technology stack
-- ALWAYS follow coding style (read file: .cursor/rules/coding_style.mdc)
-- ALWAYS follow interface design principles (read file .cursor/rules/writing_good_interfaces.mdc)
+- ALWAYS follow coding style (read file: .cursor/rules/00-coding-style.mdc)
+- ALWAYS follow interface design principles (read file: .cursor/rules/03-writing-good-interfaces.mdc)
 - ALWAYS ask for guidance when rules conflict: "Rule A states X, but Rule B states Y, should we Z because..."
 
 ## COLLABORATION PROCESS - STRICTLY ENFORCED

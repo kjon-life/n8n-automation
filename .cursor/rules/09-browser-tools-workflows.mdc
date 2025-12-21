@@ -2,15 +2,46 @@
 
 ## Overview
 
-This project uses the Browser Tools MCP (Model Context Protocol) to enable AI assistants to interact with the n8n web interface. This allows assistants to:
-- View workflows visually
-- Debug code nodes
-- Capture screenshots
-- Monitor console logs and network requests
-- Run audits (accessibility, performance, SEO)
-- Help write and test workflow code
+This project uses **two complementary MCP tool sets** for browser work:
 
-## Browser Tools Architecture
+### Playwright MCP (cursor-browser-extension) — Browser Interaction
+For **controlling** the browser and for **reading the network activity and API information**: navigation, clicking, typing, form filling, and network queries and responses.
+
+| Tool | Purpose |
+|------|---------|
+| `browser_navigate` | Go to URL |
+| `browser_snapshot` | Get accessibility tree (preferred over screenshots for interaction) |
+| `browser_click` | Click element by ref |
+| `browser_type` | Type into input |
+| `browser_wait_for` | Wait for element/text |
+
+### Browser Tools MCP — Debugging & Monitoring
+For **observing** browser state: logs, network, screenshots, audits.
+
+| Tool | Purpose |
+|------|---------|
+| `getConsoleLogs` | All console output |
+| `getConsoleErrors` | Error-level messages only |
+| `getNetworkLogs` | All network requests |
+| `getNetworkErrors` | Failed requests only |
+| `takeScreenshot` | Visual capture |
+| `runAccessibilityAudit` | WCAG audit |
+| `runPerformanceAudit` | Performance metrics |
+
+### When to Use Which
+
+| Task | Use |
+|------|-----|
+| Navigate to n8n UI | Playwright: `browser_navigate` |
+| Click a button/node | Playwright: `browser_snapshot` → `browser_click` |
+| See what's on screen | Playwright: `browser_snapshot` (for refs) or Browser Tools: `takeScreenshot` (visual) |
+| Debug JavaScript errors | Browser Tools: `getConsoleErrors` |
+| Debug API failures | Browser Tools: `getNetworkErrors` |
+| Run audits | Browser Tools: `runPerformanceAudit`, etc. |
+
+---
+
+## Browser Tools MCP Architecture
 
 The system consists of three components:
 
@@ -36,7 +67,7 @@ open -na "Google Chrome" --args "--profile-directory=Profile 2" --remote-debuggi
 
 ### Detailed Setup Instructions
 
-See: `/Volumes/VRMini/n8n/design/browser-tools-setup.md` for complete setup guide.
+Browser Tools MCP setup requires the browser-tools-server running and Chrome extension installed. See the Browser Tools MCP repository for complete setup. It works, we just have to turn it on properly.
 
 ### Important: Chrome Profile Mapping
 
@@ -131,7 +162,9 @@ Assistant: I can see you have:
 
 ### 2. Code Node Development
 
-Assistants can help write code for JavaScript and Python code nodes:
+Assistants can help write code for JavaScript code nodes:
+
+> **Note:** Python Code nodes are NOT available in n8n 2.0 npm installations. See `07-project-setup.mdc` for details.
 
 #### Process:
 1. **View current code** - Screenshot shows the code editor
@@ -165,32 +198,6 @@ const results = items.map(item => {
 
 // Return results
 return results;
-```
-
-#### Example Python Code Node
-
-```python
-# Assistant can help with Python code too:
-
-# Access input data
-items = _input.all()
-
-# Process data
-results = []
-for item in items:
-    data = item.json
-    
-    # Transform
-    results.append({
-        'json': {
-            'id': data['id'],
-            'processed': True,
-            'result': some_calculation(data)
-        }
-    })
-
-# Return
-return results
 ```
 
 ### 3. Debugging Workflows

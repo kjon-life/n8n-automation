@@ -33,6 +33,10 @@ Before doing ANY development work, coding, or answering technical questions abou
 11. Read .cursor/rules/10-n8n-v2-resources.mdc    # n8n version 2.0.1 ESSENTIAL documentation
 ```
 
+### Cursor IDE tool issues
+
+- the `run_terminal_cmd` tool REQUIRES you to run `design/00-agent-init.sh` before using to ensure a consistent shell environment for the project
+
 ### Why This Matters
 
 - Rules files contain **critical project-specific information**

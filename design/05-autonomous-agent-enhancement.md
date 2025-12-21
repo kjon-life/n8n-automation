@@ -1,6 +1,6 @@
 # The Valley Between Scripts and Shipping
 
-**TL;DR:** We built working scripts. All five actions proven. One job processed end-to-end. *That's not shipping.* The gap between "scripts work" and "workflow ships autonomously" killed more projects than bad ideas ever did.
+**TL;DR:** We built working scripts. All five actions proven. One job processed end-to-end. *That's not shipping.* The gap between "scripts work" and "workflow ships autonomously" kills more projects than bad ideas ever did.
 
 ---
 
